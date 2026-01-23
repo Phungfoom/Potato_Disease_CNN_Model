@@ -4,6 +4,8 @@ A CNN model to perform image classification on potatoes to detect diseases. Mode
 2nd step: GPS tracking, live weather, historical data. Gives contextual data as validation for Sobel, Grayscale, and Noise experiments.
 
 Dataset that model is first trained on with reduced noise is from, [Kaggle Diseased Leaves](https://www.kaggle.com/datasets/aarishasifkhan/plantvillage-potato-disease-dataset)
+As well as other diseased leaves from.
+[More lab dieseased leaves](https://data.mendeley.com/datasets/rgfhzd5mzw/1)
 
 Data set of diseased potato leaves is from [Diseased leaves](https://www.kaggle.com/datasets/nirmalsankalana/potato-leaf-disease-dataset), geographically, photos are taken in Central Java, Indonesia. Weather and GPS data from NASA power API to accurately train the model on what weather conditions caused the disease.
 
