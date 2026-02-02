@@ -3,7 +3,7 @@ A CNN model to perform image classification on potatoes to detect diseases. Mode
 
 2nd step: GPS tracking, live weather, historical data. Gives contextual data as validation for Sobel, Grayscale, and Noise experiments.
 
-Dataset that model is first trained on with reduced noise is from, [Kaggle Diseased Leaves](https://www.kaggle.com/datasets/aarishasifkhan/
+Dataset that model is first trained on with reduced noise is from, [Kaggle Diseased Leaves](https://www.kaggle.com/datasets/aarishasifkhan/plantvillage-potato-disease-dataset)
 [Healthy/Late Blight](https://www.kaggle.com/datasets/nirmalsankalana/potato-leaf-healthy-and-late-blight?select=Late+Blight)
 plantvillage-potato-disease-dataset)
 As well as other diseased leaves from.
@@ -16,7 +16,7 @@ Stem and Tuber diseases as well. [Tube/root](https://data.mendeley.com/datasets/
 
 **Grayscale vs. RGB Analysis:**
 
-Past Research: RGB yields higher results in detecting infected leaves, with the indicators bring highly color dependent. However, over-reliance on chromatic data can lead to lower accuracy in real-world lighting. When these images are converted to gray scale, the accuracy drops significantly. It brings into consideration a model’s capabilities when it comes to lab pictures vs. field pictures. [Comparison of Let Net Architecture, Inception V1 and Inception V3]( https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2023.1308528/full)
+Past Research: RGB yields higher results in detecting infected leaves, with the indicators bring highly color dependent. However, over-reliance on chromatic data can lead to lower accuracy in real-world lighting. When these images are converted to gray scale, the accuracy drops significantly. It brings into consideration a model’s capabilities when it comes to lab pictures vs. field pictures. [Comparison of Let Net Architecture, Inception V1 and Inception V3](https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2023.1308528/full)
 
 My model: Including grayscale baseline, investigating if color is a 'crutch' for the model. The grayscale test evaluates the models’ capabilities to lighting variance, seeing if the model is only relying on color intensity. RGB and Grayscale will be split into two branches to reproduce results from past research and to train the model to produce more accurate results. [Split RGB and Grayscale]( https://mendel-journal.org/index.php/mendel/article/view/176/175)
 
