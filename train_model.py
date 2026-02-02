@@ -27,7 +27,7 @@ val_spud = tf.keras.utils.image_dataset_from_directory(
     dataset_dir,
     validation_split = 0.3,
     subset = 'validation',
-    seed = 123
+    seed = 123,
     image_size = (224, 224),
     batch_size = 32,
     shuffle = False
