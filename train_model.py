@@ -1,6 +1,5 @@
 import os
 import tensorflow as tf
-import matplotlib.pyplot as plt 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 dataset_dir = os.path.join(script_dir, 'hot_potato')
@@ -32,3 +31,8 @@ val_spud = tf.keras.utils.image_dataset_from_directory(
     batch_size = 32,
     shuffle = False
 )
+
+class_names = train_spud.class_names
+num_classes = len(class_names)
+
+print(f"Number of classes {num_classes}, classes: {class_names}")
