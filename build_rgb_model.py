@@ -1,9 +1,7 @@
-# 1. Dual-Branch structure (RGB/Grayscale)
-import os 
+# 1. Dual-Branch structure (RGB)
 import tensorflow as tf
-from tensorflow.keras import layers, models, Input
 
-def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3):
+def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets
     
     inputs = tf.keras.Input(shape = input_shape, 
                             name = "rgb_input")
@@ -17,8 +15,7 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3):
                                padding = 'same', # output size = input size
                                name = 'rgb_conv1')(inputs) # for grad-CAM to find later
     
-    x = tf.keras.layers.MaxPooling2D((2, 2), # 
-                                      name = 'rgb_pool1')(x)
+    x = tf.keras.layers.MaxPooling2D((2, 2), name = 'rgb_pool1')(x)
 
     # (b) Block 2: Dectect Patterns
     # Shape and Texture Detection
@@ -44,7 +41,7 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3):
                               activation = 'relu', 
                               name = 'rgb_dense')(x)
     
-    x = tf.keras.laters.Dropout(0.3)(x) # tunes off 30% of neurons every training step
+    x = tf.keras.layers.Dropout(0.3)(x) # tunes off 30% of neurons every training step
 
     # Output
     outputs = tf.keras.layers.Dense(num_classes, 
@@ -53,12 +50,14 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3):
 
     # Create Model 
 
-    model = tf.keras.models.Model(inputs = inputs, outputs = outputs, name = 'RGB_Specialists')
+    model = tf.keras.models.Model(inputs = inputs, 
+                                  outputs = outputs, 
+                                  name = 'RGB_Specialists')
 
     # lower error 
     model.compile(
         optimizer = 'adam', # keep momentum/step size (convergence)
-        loss = 'sparse_categorical_crossentropy',
+        loss = 'sparse_categorical_crossentropy', # grade model 
         metrics = ['accuracy']
     )
     return model 
