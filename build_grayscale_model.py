@@ -4,7 +4,7 @@ import tensorflow as tf
 
 def build_grayscale_model(input_shape = (224, 224, 1), num_classes = 3): # 1 sheet
     
-    inputs = tf.keras.Input(shape=input_shape, name = "gray_input")
+    inputs = tf.keras.Input(shape = input_shape, name = "gray_input")
     
     # (a) Block 1: Texture & Edges
     x = tf.keras.layers.Conv2D(32, (3, 3), 
