@@ -1,7 +1,7 @@
 # 1. Dual-Branch structure (RGB)
 import tensorflow as tf
 
-def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets
+def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, numbers per pixel
     
     inputs = tf.keras.Input(shape = input_shape, 
                             name = "rgb_input")
@@ -10,7 +10,8 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets
     # (a) Block 1: Detects Basics
     #  Groups of pixels (3x3), colors, edges, contrasts
 
-    x = tf.keras.layers.Conv2D(32, (3, 3), # 32 filters, 3x3 for details
+    x = tf.keras.layers.Conv2D(filters = 32,
+                               kernel_size = (3, 3), # for details 
                                activation = 'relu', # adding bends, positive signals to next layer
                                padding = 'same', # output size = input size
                                name = 'rgb_conv1')(inputs) # for grad-CAM to find later
@@ -20,7 +21,8 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets
     # (b) Block 2: Dectect Patterns
     # Shape and Texture Detection
 
-    x = tf.keras.layers.Conv2D(64, (3, 3), # more feature layers for complexity
+    x = tf.keras.layers.Conv2D(filters = 64, 
+                               kernel_size = (3, 3), # more feature layers for complexity
                                activation = 'relu', 
                                padding = 'same')(x)
     
@@ -29,7 +31,8 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets
     # (c) Block 3: Detects Concepts
     # Combines shapes/textures
 
-    x = tf.keras.layers.Conv2D(128, (3, 3), 
+    x = tf.keras.layers.Conv2D(filters = 128, 
+                               kernel_size = (3, 3), 
                                activation = 'relu', 
                                padding = 'same')(x)
     
@@ -37,7 +40,7 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets
 
     # Classifier
 
-    x = tf.keras.layers.Dense(64, 
+    x = tf.keras.layers.Dense(units = 64, 
                               activation = 'relu', 
                               name = 'rgb_dense')(x)
     

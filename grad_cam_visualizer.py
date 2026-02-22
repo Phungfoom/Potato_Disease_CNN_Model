@@ -1,13 +1,10 @@
 # GRAD CAM 
-
-import os
 import numpy as np
 import tensorflow as tf
-import cv2
 import matplotlib.pyplot as plt
 
 model_path = 'potato_grayscale_model.h5'
-test_image_path = r''
+test_image_path = r'C:\Users\phung\Documents\potato_id\hot_potato\blackleg\2.jpg'
 
 last_conv_layer = 'gray_conv3'
 
@@ -16,7 +13,7 @@ def make_gradcam_heatmap(img_array, model, last_conv_layer_name, pred_index = No
     # Ouput feature maps and final predictions score
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(last_conv_layer_name).output, model.output])
     
-    # Compute gradient
+    # Compute gradient of target class score
     with tf.GradientTape() as tape: 
         last_conv_layer_output, preds = grad_model(img_array)
         if pred_index is None:
@@ -33,3 +30,4 @@ def make_gradcam_heatmap(img_array, model, last_conv_layer_name, pred_index = No
        # Normalize
         heatmap = tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap) # RelU, deletes negatives.
         return heatmap.numpy()
+        

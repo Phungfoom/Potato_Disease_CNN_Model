@@ -60,12 +60,12 @@ EPOCHS = 10
 history = model.fit(
     train_spud,
     validation_data=val_spud,
-    epochs=EPOCHS,
+    epochs = EPOCHS,
     verbose=1
 )
 
 print('saving model...')
-model.save('potato_rgb_model.h5')
+model.save('potato_rgb_model.keras')
 print('model saved')
 
 # Visualize 
@@ -76,7 +76,7 @@ loss = history.history['loss']
 val_loss = history.history['val_loss']
 
 epochs_range = range(EPOCHS)
-plt.figure(figsize=(12, 6))
+plt.figure(figsize = (12, 6))
 
 # Plot: Accuracy
 plt.subplot(1, 2, 1)
@@ -95,6 +95,8 @@ plt.title('Training and Validation Loss')
 plt.grid(True)
 
 plt.show()
+
+
 
 
 
