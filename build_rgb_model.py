@@ -34,7 +34,8 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, n
     x = tf.keras.layers.Conv2D(filters = 128, 
                                kernel_size = (3, 3), 
                                activation = 'relu', 
-                               padding = 'same')(x)
+                               padding = 'same',
+                               name = 'rgb_conv3_final')(x)
     
     x = tf.keras.layers.GlobalAveragePooling2D()(x) # reduces paramter count
 
