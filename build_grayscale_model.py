@@ -26,7 +26,7 @@ def build_grayscale_model(input_shape = (224, 224, 1), num_classes = 3): # 1 she
     x = tf.keras.layers.Conv2D(128, (3, 3), 
                                activation = 'relu', 
                                padding = 'same', 
-                               name = 'gray_conv3')(x)
+                               name = 'gray_conv3_final')(x)
     
     x = tf.keras.layers.GlobalAveragePooling2D(name = 'gray_global_pool')(x) 
 
