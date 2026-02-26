@@ -1,7 +1,8 @@
 # 1. Dual-Branch structure (RGB)
 import tensorflow as tf
+import config
 
-def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, numbers per pixel
+def build_rgb_model(input_shape = (*config.DATA_PARAMS['image_size'], 3), num_classes = config.NUM_CLASSES): # 3 sheets, numbers per pixel
     
     inputs = tf.keras.Input(shape = input_shape, 
                             name = "rgb_input")
@@ -40,7 +41,7 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, n
                                padding = 'same',
                                name = 'rgb_conv3_final')(x)
     
-    x = tf.keras.layers.GlobalAveragePooling2D()(x) # reduces paramter count
+    x = tf.keras.layers.GlobalAveragePooling2D(name = 'rgb_global_pool')(x) # reduces paramter count
 
     # Classifier
 
@@ -48,7 +49,7 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, n
                               activation = 'relu', 
                               name = 'rgb_dense')(x)
     
-    x = tf.keras.layers.Dropout(0.3)(x) # tunes off 30% of neurons every training step
+    x = tf.keras.layers.Dropout(config.DROPOUT_RATE)(x) # tunes off 30% of neurons every training step
 
     # Output
     outputs = tf.keras.layers.Dense(num_classes, 
