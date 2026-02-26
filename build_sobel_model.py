@@ -1,4 +1,5 @@
 import tensorflow as tf
+import config 
 
 def sobel_edge_layer(x):
 
@@ -14,14 +15,11 @@ def sobel_edge_layer(x):
     return magnitude # rate of change of pixel intensity
 
 # model input layers (3x3)
-def build_sobel_model(input_shape = (224, 224, 1), num_classes = 3):
+def build_sobel_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), num_classes = config.NUM_CLASSES):
         
     inputs = tf.keras.Input(shape = input_shape, name = "sobel_input")
     x = tf.keras.layers.Lambda(function = sobel_edge_layer, 
-                               output_shape = None, # infer, not cropping images
-                               mask = None, # ignore padding 
-                               arguemnt = None, # threshold value
-                               name = "sobel_input") 
+                               name = "sobel_mag")(inputs) 
 
     # Low: Edges  
     # convolution layers (activation)

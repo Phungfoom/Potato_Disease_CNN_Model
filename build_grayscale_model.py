@@ -1,8 +1,9 @@
 # 1. Dual-Branch structure (Grayscale)
 
 import tensorflow as tf
+import config
 
-def build_grayscale_model(input_shape = (224, 224, 1), num_classes = 3): # 1 sheet
+def build_grayscale_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), num_classes = config.NUM_CLASSES): # 1 sheet
     
     inputs = tf.keras.Input(shape = input_shape, name = "gray_input")
     
