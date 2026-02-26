@@ -38,11 +38,11 @@ for input_path, output_path in tqdm(image_files, desc='Resizing'):
         img = tf.io.decode_image(img_bytes, channels=3, expand_animations=False)
 
         # Standardized image size (224x224)
-        img_resized = tf.image.resize(img, target_size)
+        img_resized = tf.image.resize(img, target_size, method = 'pad', antialias = True)
 
         # Convert and save directly to the perfectly mapped output_path
         img_uint8 = tf.cast(img_resized, tf.uint8)
-        encoded_img = tf.io.encode_jpeg(img_uint8, quality=90)
+        encoded_img = tf.io.encode_jpeg(img_uint8, quality = 90)
         tf.io.write_file(output_path, encoded_img)
 
     except Exception as e:

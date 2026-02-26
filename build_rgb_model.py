@@ -7,7 +7,8 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, n
                             name = "rgb_input")
     
     # Features: What is the model looking for?
-    # (a) Block 1: Detects Basics
+    # low
+    # (a) Detects Basics
     #  Groups of pixels (3x3), colors, edges, contrasts
 
     x = tf.keras.layers.Conv2D(filters = 32,
@@ -18,7 +19,8 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, n
     
     x = tf.keras.layers.MaxPooling2D((2, 2), name = 'rgb_pool1')(x)
 
-    # (b) Block 2: Dectect Patterns
+    # middle
+    # (b) Dectect Patterns
     # Shape and Texture Detection
 
     x = tf.keras.layers.Conv2D(filters = 64, 
@@ -28,7 +30,8 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, n
     
     x = tf.keras.layers.MaxPooling2D((2,2))(x)
 
-    # (c) Block 3: Detects Concepts
+    # high
+    # (c) Detects Concepts
     # Combines shapes/textures
 
     x = tf.keras.layers.Conv2D(filters = 128, 
@@ -56,7 +59,7 @@ def build_rgb_model(input_shape = (224, 224, 3), num_classes = 3): # 3 sheets, n
 
     model = tf.keras.models.Model(inputs = inputs, 
                                   outputs = outputs, 
-                                  name = 'RGB_Specialists')
+                                  name = 'RGB_Brain')
 
     # lower error 
     model.compile(
