@@ -6,15 +6,18 @@ def build_grayscale_model(input_shape = (224, 224, 1), num_classes = 3): # 1 she
     
     inputs = tf.keras.Input(shape = input_shape, name = "gray_input")
     
-    # (a) Block 1: Texture & Edges
-    x = tf.keras.layers.Conv2D(32, (3, 3), 
+    # low 
+    # (a) Texture & Edges
+    x = tf.keras.layers.Conv2D(filters = 32, 
+                               kernel_size = (3, 3), 
                                activation = 'relu', 
                                padding = 'same', 
                                name = 'gray_conv1')(inputs)
     
     x = tf.keras.layers.MaxPooling2D((2, 2), name = 'gray_pool1')(x)
 
-    # (b) Block 2: Shapes & Patterns
+    # middle
+    # (b) Shapes & Patterns
     x = tf.keras.layers.Conv2D(64, (3, 3), 
                                activation = 'relu', 
                                padding = 'same', 
@@ -22,7 +25,8 @@ def build_grayscale_model(input_shape = (224, 224, 1), num_classes = 3): # 1 she
     
     x = tf.keras.layers.MaxPooling2D((2,2), name = 'gray_pool2')(x)
 
-    # (c) Block 3: Complex Geometry (The "Leaf Roll" detector)
+    # high
+    # (c) Complex Geometry (The "Leaf Roll" detector)
     x = tf.keras.layers.Conv2D(128, (3, 3), 
                                activation = 'relu', 
                                padding = 'same', 
@@ -42,7 +46,7 @@ def build_grayscale_model(input_shape = (224, 224, 1), num_classes = 3): # 1 she
     # Create Model
     model = tf.keras.models.Model(inputs = inputs, 
                                   outputs=outputs, 
-                                  name = 'Grayscale_Specialist')
+                                  name = 'Grayscale_Brain')
 
     model.compile(
         optimizer = 'adam', 
