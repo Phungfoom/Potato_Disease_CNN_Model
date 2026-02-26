@@ -58,7 +58,7 @@ def build_sobel_model(input_shape = (224, 224, 1), num_classes = 3):
     x = tf.keras.layers.GlobalAveragePooling2D(name = 'sobel_global_pool')(x)
 
     # connection layers (classifier)
-    x = tf.keras.layers.Dense(filters = 64, 
+    x = tf.keras.layers.Dense(units = 64, 
                               activation = 'relu', 
                               name = 'sobel_dense')(x)
     x = tf.keras.layers.Dropout(0.3)(x)
@@ -70,7 +70,7 @@ def build_sobel_model(input_shape = (224, 224, 1), num_classes = 3):
     
     model = tf.keras.models.Model(inputs = inputs, 
                                   outputs = outputs, 
-                                  name = 'Sobel_Edge')
+                                  name = 'Sobel_Edge_Brain')
     model.compile(
         optimizer = 'adam', 
         loss = 'sparse_categorical_crossentropy',
