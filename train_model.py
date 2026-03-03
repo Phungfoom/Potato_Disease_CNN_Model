@@ -11,9 +11,9 @@ from Potato_bunch_brain import build_combined_model
 from sklearn.metrics import classification_report, confusion_matrix
 
 # Focus on leaf and tubr for foundation, field is midterm
-parser = argparse.ArgumentParser(description="Train Potato ID Fusion Model")
-parser.add_argument('--domain', type=str, required=True, choices=['leaf', 'tube', 'field'])
-parser.add_argument('--stage', type=str, default="foundation", choices=['foundation', 'midterm'])
+parser = argparse.ArgumentParser(description = "Train Potato ID Fusion Model")
+parser.add_argument('--domain', type = str, required = True, choices = ['leaf', 'tube', 'field'])
+parser.add_argument('--stage', type = str, default = "foundation", choices = ['foundation', 'midterm'])
 args = parser.parse_args()
 
 script_dir = os.path.dirname(os.path.abspath(__file__))

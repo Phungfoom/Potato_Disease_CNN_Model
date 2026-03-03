@@ -2,7 +2,7 @@
 import tensorflow as tf
 import config
 
-def build_rgb_model(input_shape = (*config.DATA_PARAMS['image_size'], 3), num_classes = config.NUM_CLASSES): # 3 sheets, numbers per pixel
+def build_rgb_model(input_shape = (*config.DATA_PARAMS['image_size'], 3), num_classes = None): # 3 sheets, numbers per pixel
     
     inputs = tf.keras.Input(shape = input_shape, 
                             name = "rgb_input")

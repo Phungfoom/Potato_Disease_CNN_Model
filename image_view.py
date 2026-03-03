@@ -4,7 +4,7 @@ import os
 
 # Random images for report
 base_dir = 'hot_potato'
-categories = ['leaf_classes', 'field_classes', 'tube_classes']
+categories = ['leaf_classes','tube_classes']
 
 # Loop to go through folder categories
 for cat in categories:
