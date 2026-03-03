@@ -52,7 +52,14 @@ num_classes = len(class_names)
 def prepare_triple_input(image, label):
     norm_image = tf.cast(image, tf.float32) / 255.0 # Normalize 
     gray_image = tf.image.rgb_to_grayscale(norm_image)
-    return (norm_image, gray_image, gray_image), label # rgb, gray, sobel 
+
+    # start a branch
+    sobel = tf.image.sobel_edges(gray_image[tf.newaxis, ...])[0]
+    # combine horizontal and vertical edges for mag.
+    sobel_mag = tf.sqrt(tf.reduce_sum(tf.square(sobel), axis = -1))
+    # standarized 
+    sobel_mag = tf.image.per_image_standardization(sobel_mag)
+    return (norm_image, gray_image, sobel_mag), label # rgb, gray, sobel 
 
 train_spud = train_raw.map(prepare_triple_input).cache().prefetch(tf.data.AUTOTUNE)
 val_spud = val_raw.map(prepare_triple_input).cache().prefetch(tf.data.AUTOTUNE)
