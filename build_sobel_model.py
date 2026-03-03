@@ -15,7 +15,7 @@ def sobel_edge_layer(x):
     return magnitude # rate of change of pixel intensity
 
 # model input layers (3x3)
-def build_sobel_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), num_classes = config.NUM_CLASSES):
+def build_sobel_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), num_classes = None):
         
     inputs = tf.keras.Input(shape = input_shape, name = "sobel_input")
     x = tf.keras.layers.Lambda(function = sobel_edge_layer, 

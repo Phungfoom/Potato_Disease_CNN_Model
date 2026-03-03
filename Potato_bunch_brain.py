@@ -1,13 +1,12 @@
 import config
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 from build_rgb_model import build_rgb_model
 from build_grayscale_model import build_grayscale_model
 from build_sobel_model import build_sobel_model
 
 
-def build_combined_model(num_classes = config.NUM_CLASSES):
+def build_combined_model(num_classes):
     
     img_size = config.DATA_PARAMS['image_size']
 
