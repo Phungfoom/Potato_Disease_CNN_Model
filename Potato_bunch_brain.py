@@ -10,9 +10,9 @@ def build_combined_model(num_classes):
     
     img_size = config.DATA_PARAMS['image_size']
 
-    rgb_branch = build_rgb_model(input_shape=(*img_size, 3))
-    gray_branch = build_grayscale_model(input_shape=(*img_size, 1))
-    sobel_branch = build_sobel_model(input_shape=(*img_size, 1))
+    rgb_branch = build_rgb_model(input_shape=(*img_size, 3), num_classes = num_classes)
+    gray_branch = build_grayscale_model(input_shape=(*img_size, 1), num_classes = num_classes)
+    sobel_branch = build_sobel_model(input_shape=(*img_size, 1), num_classes = num_classes)
 
     # 1 combined vector for features 
     merged = tf.keras.layers.Concatenate(name = "feature_combined")([
