@@ -21,15 +21,15 @@ args = parser.parse_args()
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 DOMAIN = args.domain
+timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
 # Train on foundation, then midterm for fields, and NASA API for final check
+
 if args.stage == "foundation":
-    print(f"--- STAGE 1: {DOMAIN.upper()} Foundation Training ---")
-    # Dynamically find leaf_classes or tube_classes
     data_dir = os.path.join(script_dir, config.BASE_DIR, f'{DOMAIN}_classes')
 else:
-    # Field domain for midterm
-    data_dir = os.path.join(script_dir, config.BASE_DIR, f'{DOMAIN}_classes')
+    # Example: Midterm might use a different directory for "Field" tests
+    data_dir = os.path.join(script_dir, config.BASE_DIR, f'midterm_{DOMAIN}_data')
 
 train_raw = tf.keras.utils.image_dataset_from_directory(
     data_dir,
@@ -40,9 +40,8 @@ train_raw = tf.keras.utils.image_dataset_from_directory(
     **config.DATA_PARAMS)
 
 # weights for abundance of some photos over another 
-y_train = np.concatenate([y for x, y in train_raw], axis = 0)
+y_train = np.concatenate([y for _, y in train_raw], axis = 0)
 
-from sklearn.utils import class_weight
 weights = class_weight.compute_class_weight(
     class_weight = 'balanced',
     classes = np.unique(y_train),
@@ -60,39 +59,42 @@ val_raw = tf.keras.utils.image_dataset_from_directory(
     shuffle = True,
     **config.DATA_PARAMS)
 
-val_labels = np.concatenate([y for x, y in val_raw], axis=0)
+val_labels = np.concatenate([y for _, y in val_raw], axis=0)
 print("Validation images per class:", dict(zip(class_names, np.bincount(val_labels))))
 
 # Inputs for 3 branches 
 def prepare_triple_input(image, label):
     norm_image = tf.cast(image, tf.float32) / 255.0 # Normalize 
     gray_image = tf.image.rgb_to_grayscale(norm_image)
+    sobel_image = tf.image.sobel_edges(gray_image)
+    sobel_image = tf.reduce_sum(tf.abs(sobel_image), axis = -1)
 
-    return (norm_image, gray_image, gray_image), label # rgb, gray, sobel 
+    return (norm_image, gray_image, sobel_image), label # rgb, gray, sobel 
 
-train_spud = train_raw.map(prepare_triple_input).cache().prefetch(tf.data.AUTOTUNE)
-val_spud = val_raw.map(prepare_triple_input).cache().prefetch(tf.data.AUTOTUNE)
+train_spud = train_raw.map(prepare_triple_input).cache('spud_cache').prefetch(tf.data.AUTOTUNE)
+val_spud = val_raw.map(prepare_triple_input).cache('spud_cache').prefetch(tf.data.AUTOTUNE)
 
 # training history 
-def plot_training_history(history, plot_dir, domain, stage):
+def plot_training_history(history, plot_dir, domain, stage, timestamp):
     sns.set_theme(style = "whitegrid")
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+    plt.subplots(1, 2, figsize = (15, 5))
 
     # Accuracy
     sns.lineplot(x = range(len(history.history['accuracy'])), 
-                 y = history.history['accuracy'], label = 'Train Acc', ax = ax1)
+                 y = history.history['accuracy'], label = 'Train Acc')
     sns.lineplot(x=range(len(history.history['val_accuracy'])), 
-                 y = history.history['val_accuracy'], label = 'Val Acc', ax = ax1)
-    ax1.set_title(f'Accuracy: {domain} ({stage})')
+                 y = history.history['val_accuracy'], label = 'Val Acc')
+    plt.title(f'Accuracy: {domain} ({stage})')
 
     # Loss
     sns.lineplot(x = range(len(history.history['loss'])), 
-                 y = history.history['loss'], label = 'Train Loss', ax = ax2)
+                 y = history.history['loss'], label = 'Train Loss')
     sns.lineplot(x = range(len(history.history['val_loss'])), 
-                 y = history.history['val_loss'], label = 'Val Loss', ax = ax2)
-    ax2.set_title(f'Loss: {domain} ({stage})')
+                 y = history.history['val_loss'], label = 'Val Loss')
+    plt.title(f'Loss: {domain} ({stage})')
 
-    plt.savefig(os.path.join(plot_dir, f'history_{domain}_{stage}.png'))
+    plt.tight_layout()
+    plt.savefig(os.path.join(plot_dir, f'history_{domain}_{stage}_{timestamp}.png'))    
     plt.close()
 
 model = build_combined_model(num_classes = num_classes)
@@ -103,8 +105,6 @@ plot_dir = os.path.join(script_dir, config.OUTPUT_DIR, 'fusion', 'plots')
 os.makedirs(model_dir, exist_ok = True)
 os.makedirs(plot_dir, exist_ok = True)
 
-timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-
 history = model.fit(
     train_spud,
     validation_data = val_spud,
@@ -112,15 +112,14 @@ history = model.fit(
     class_weight = class_weights_dict)
 
 model.save(os.path.join(model_dir, f'potato_{DOMAIN}_model_{timestamp}.keras'))
-plot_training_history(history, plot_dir, DOMAIN, args.stage)
+plot_training_history(history, plot_dir, DOMAIN, args.stage, timestamp)
 
 # Confusion Matrtix for predictions
-y_true = []
-y_pred = []
+y_true, y_pred = [], []
 
 # Classification Report
 for images, labels in tqdm(val_spud, desc = "Evaluating"):   
-    preds = model.predict(list(images), verbose = 0)
+    preds = model.predict_on_batch(images)
     y_true.extend(labels.numpy())
     y_pred.extend(np.argmax(preds, axis = 1))
 
@@ -136,7 +135,15 @@ def save_report_as_image(y_true, y_pred, target_names, plot_dir):
     plt.savefig(os.path.join(plot_dir, f'report_{DOMAIN}_{timestamp}.png'), bbox_inches = 'tight')
     plt.close()
 
+save_report_as_image(y_true, y_pred, class_names, plot_dir)
+
 cm = confusion_matrix(y_true, y_pred)
+
+row_sums = cm.sum(axis=1)[:, np.newaxis]
+cm_perc = np.divide(cm.astype('float'), row_sums, 
+                    out=np.zeros_like(cm, dtype=float), 
+                    where=row_sums != 0)
+
 plt.figure(figsize = (10, 8))
 sns.heatmap(cm, annot = True, fmt = 'd', 
             xticklabels = class_names, 
@@ -145,3 +152,12 @@ plt.title(f'Confusion Matrix: {DOMAIN} Fusion Model')
 plt.ylabel('Actual')
 plt.xlabel('Predicted')
 plt.savefig(os.path.join(plot_dir, f'cm_{DOMAIN}_{timestamp}.png'), bbox_inches = 'tight')
+plt.close()
+
+plt.figure(figsize = (12, 10)) 
+sns.heatmap(cm_perc, annot = True, fmt = '.2f', xticklabels = class_names, yticklabels=class_names, cmap = 'Blues')
+plt.title(f'Confusion Matrix (Percentages): {DOMAIN}')
+plt.ylabel('Actual')
+plt.xlabel('Predicted')
+plt.savefig(os.path.join(plot_dir, f'cm_percent_{DOMAIN}_{timestamp}.png'), bbox_inches = 'tight')
+plt.close()
