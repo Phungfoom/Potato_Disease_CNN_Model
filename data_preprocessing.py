@@ -31,14 +31,14 @@ for root, dir, files in os.walk(input_dir):
 
 print('Tensorflow: Resizing.')
 
-for input_path, output_path in tqdm(image_files, desc='Resizing'):
+for input_path, output_path in tqdm(image_files, desc = 'Resizing'):
     try:
         # Standardized RGB 
         img_bytes = tf.io.read_file(input_path)
-        img = tf.io.decode_image(img_bytes, channels=3, expand_animations=False)
+        img = tf.io.decode_image(img_bytes, channels = 3, expand_animations = False)
 
         # Standardized image size (224x224)
-        img_resized = tf.image.resize(img, target_size, method = 'pad', antialias = True)
+        img_resized = tf.image.resize_with_pad(img, target_height = target_size[0], target_width = target_size[1], antialias = True)
 
         # Convert and save directly to the perfectly mapped output_path
         img_uint8 = tf.cast(img_resized, tf.uint8)

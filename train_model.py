@@ -5,10 +5,13 @@ import config
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from tqdm import tqdm
+import pandas as pd
+import datetime
 
+from tqdm import tqdm
 from Potato_bunch_brain import build_combined_model
 from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.utils import class_weight
 
 # Focus on leaf and tubr for foundation, field is midterm
 parser = argparse.ArgumentParser(description = "Train Potato ID Fusion Model")
@@ -28,7 +31,6 @@ else:
     # Field domain for midterm
     data_dir = os.path.join(script_dir, config.BASE_DIR, f'{DOMAIN}_classes')
 
-
 train_raw = tf.keras.utils.image_dataset_from_directory(
     data_dir,
     validation_split = 0.3,
@@ -37,29 +39,36 @@ train_raw = tf.keras.utils.image_dataset_from_directory(
     shuffle = True,
     **config.DATA_PARAMS)
 
-val_raw = tf.keras.utils.image_dataset_from_directory(
-    data_dir,
-    validation_split = 0.3,
-    subset="validation",
-    color_mode = "rgb",
-    shuffle = False,
-    **config.DATA_PARAMS)
+# weights for abundance of some photos over another 
+y_train = np.concatenate([y for x, y in train_raw], axis = 0)
+
+from sklearn.utils import class_weight
+weights = class_weight.compute_class_weight(
+    class_weight = 'balanced',
+    classes = np.unique(y_train),
+    y = y_train)
+class_weights_dict = dict(enumerate(weights))
 
 class_names = train_raw.class_names
 num_classes = len(class_names)
+
+val_raw = tf.keras.utils.image_dataset_from_directory(
+    data_dir,
+    validation_split = 0.3,
+    subset = "validation",
+    color_mode = "rgb",
+    shuffle = True,
+    **config.DATA_PARAMS)
+
+val_labels = np.concatenate([y for x, y in val_raw], axis=0)
+print("Validation images per class:", dict(zip(class_names, np.bincount(val_labels))))
 
 # Inputs for 3 branches 
 def prepare_triple_input(image, label):
     norm_image = tf.cast(image, tf.float32) / 255.0 # Normalize 
     gray_image = tf.image.rgb_to_grayscale(norm_image)
 
-    # start a branch
-    sobel = tf.image.sobel_edges(gray_image[tf.newaxis, ...])[0]
-    # combine horizontal and vertical edges for mag.
-    sobel_mag = tf.sqrt(tf.reduce_sum(tf.square(sobel), axis = -1))
-    # standarized 
-    sobel_mag = tf.image.per_image_standardization(sobel_mag)
-    return (norm_image, gray_image, sobel_mag), label # rgb, gray, sobel 
+    return (norm_image, gray_image, gray_image), label # rgb, gray, sobel 
 
 train_spud = train_raw.map(prepare_triple_input).cache().prefetch(tf.data.AUTOTUNE)
 val_spud = val_raw.map(prepare_triple_input).cache().prefetch(tf.data.AUTOTUNE)
@@ -94,32 +103,38 @@ plot_dir = os.path.join(script_dir, config.OUTPUT_DIR, 'fusion', 'plots')
 os.makedirs(model_dir, exist_ok = True)
 os.makedirs(plot_dir, exist_ok = True)
 
+timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
 history = model.fit(
     train_spud,
     validation_data = val_spud,
-    epochs = config.EPOCHS)
+    epochs = config.EPOCHS,
+    class_weight = class_weights_dict)
 
-model.save(os.path.join(model_dir, f'potato_{DOMAIN}_fusion_model.keras'))
+model.save(os.path.join(model_dir, f'potato_{DOMAIN}_model_{timestamp}.keras'))
 plot_training_history(history, plot_dir, DOMAIN, args.stage)
 
 # Confusion Matrtix for predictions
 y_true = []
 y_pred = []
-total_batches = tf.data.experimental.cardinality(val_spud).numpy()
-
-for images, labels in tqdm(val_spud, total = total_batches, desc = "Evaluating"):
-    preds = model.predict(images, verbose = 0)
-    y_true.extend(labels.numpy())
-    y_pred.extend(np.argmax(preds, axis = 1))
 
 # Classification Report
-for images, labels in tqdm(val_spud, total = total_batches, desc = "Evaluating"):   
-    preds = model.predict(images, verbose = 0)
+for images, labels in tqdm(val_spud, desc = "Evaluating"):   
+    preds = model.predict(list(images), verbose = 0)
     y_true.extend(labels.numpy())
     y_pred.extend(np.argmax(preds, axis = 1))
 
-print(classification_report(y_true, y_pred, target_names = class_names))
+def save_report_as_image(y_true, y_pred, target_names, plot_dir):
+    # Create the report as a dictionary
+    report = classification_report(y_true, y_pred, target_names=target_names, output_dict=True)
+    df = pd.DataFrame(report).transpose().round(2)
 
+    plt.figure(figsize=(8, 4))
+    plt.table(cellText=df.values, rowLabels=df.index, colLabels=df.columns, loc='center')
+    plt.axis('off')
+    plt.title(f"Results: {DOMAIN}")
+    plt.savefig(os.path.join(plot_dir, f'report_{DOMAIN}_{timestamp}.png'), bbox_inches = 'tight')
+    plt.close()
 
 cm = confusion_matrix(y_true, y_pred)
 plt.figure(figsize = (10, 8))
@@ -129,4 +144,4 @@ sns.heatmap(cm, annot = True, fmt = 'd',
 plt.title(f'Confusion Matrix: {DOMAIN} Fusion Model')
 plt.ylabel('Actual')
 plt.xlabel('Predicted')
-plt.savefig(os.path.join(plot_dir, 'confusion_matrix.png'))
+plt.savefig(os.path.join(plot_dir, f'cm_{DOMAIN}_{timestamp}.png'), bbox_inches = 'tight')
