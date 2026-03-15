@@ -123,26 +123,30 @@ for images, labels in tqdm(val_spud, desc = "Evaluating"):
     y_true.extend(labels.numpy())
     y_pred.extend(np.argmax(preds, axis = 1))
 
-def save_report_as_image(y_true, y_pred, target_names, plot_dir):
+def save_report_as_image(y_true, y_pred, target_names, plot_dir, timestamp):
+    #which class exists
+    present_classes = np.unique(y_true)
+    filtered_names = [target_names[i] for i in present_classes]
+
     # Create the report as a dictionary
-    report = classification_report(y_true, y_pred, target_names=target_names, output_dict=True)
+    report = classification_report(y_true, y_pred, labels = present_classes, target_names = target_names, output_dict = True)
     df = pd.DataFrame(report).transpose().round(2)
 
-    plt.figure(figsize=(8, 4))
-    plt.table(cellText=df.values, rowLabels=df.index, colLabels=df.columns, loc='center')
+    plt.figure(figsize = (8, 5))
+    plt.table(cellText=df.values, rowLabels = df.index, colLabels = df.columns, loc = 'center')
     plt.axis('off')
     plt.title(f"Results: {DOMAIN}")
     plt.savefig(os.path.join(plot_dir, f'report_{DOMAIN}_{timestamp}.png'), bbox_inches = 'tight')
     plt.close()
 
-save_report_as_image(y_true, y_pred, class_names, plot_dir)
+save_report_as_image(y_true, y_pred, class_names, plot_dir, timestamp)
 
 cm = confusion_matrix(y_true, y_pred)
 
 row_sums = cm.sum(axis=1)[:, np.newaxis]
 cm_perc = np.divide(cm.astype('float'), row_sums, 
                     out=np.zeros_like(cm, dtype=float), 
-                    where=row_sums != 0)
+                    where = row_sums != 0)
 
 plt.figure(figsize = (10, 8))
 sns.heatmap(cm, annot = True, fmt = 'd', 
