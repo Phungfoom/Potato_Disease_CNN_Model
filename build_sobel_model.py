@@ -46,7 +46,7 @@ def build_sobel_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), num_
 
     # High: Shape
     # convolution layers (activation)
-    x = tf.keras.layers.Conv2D(filters = 128,
+    final_conv_layer_sobel = tf.keras.layers.Conv2D(filters = 128,
                                kernel_size = (3, 3),
                                activation = 'relu',
                                padding = 'same',
@@ -74,4 +74,4 @@ def build_sobel_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), num_
         loss = 'sparse_categorical_crossentropy',
         metrics = ['accuracy']
     )
-    return model
+    return model, final_conv_layer_sobel

@@ -35,7 +35,7 @@ def build_rgb_model(input_shape = (*config.DATA_PARAMS['image_size'], 3), num_cl
     # (c) Detects Concepts
     # Combines shapes/textures
 
-    x = tf.keras.layers.Conv2D(filters = 128, 
+    final_conv_layer_rgb = tf.keras.layers.Conv2D(filters = 128, 
                                kernel_size = (3, 3), 
                                activation = 'relu', 
                                padding = 'same',
@@ -68,5 +68,5 @@ def build_rgb_model(input_shape = (*config.DATA_PARAMS['image_size'], 3), num_cl
         loss = 'sparse_categorical_crossentropy', # grade model 
         metrics = ['accuracy']
     )
-    return model 
+    return model, final_conv_layer_rgb
 

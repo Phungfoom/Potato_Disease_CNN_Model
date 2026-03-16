@@ -28,7 +28,7 @@ def build_grayscale_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), 
 
     # high
     # (c) Complex Geometry (The "Leaf Roll" detector)
-    x = tf.keras.layers.Conv2D(128, (3, 3), 
+    final_conv_layer_gray = tf.keras.layers.Conv2D(128, (3, 3), 
                                activation = 'relu', 
                                padding = 'same', 
                                name = 'gray_conv3_final')(x)
@@ -54,4 +54,4 @@ def build_grayscale_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), 
         loss = 'sparse_categorical_crossentropy',
         metrics = ['accuracy']
     )
-    return model
+    return model, final_conv_layer_gray

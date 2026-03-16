@@ -129,7 +129,7 @@ def save_report_as_image(y_true, y_pred, target_names, plot_dir, timestamp):
     filtered_names = [target_names[i] for i in present_classes]
 
     # Create the report as a dictionary
-    report = classification_report(y_true, y_pred, labels = present_classes, target_names = target_names, output_dict = True)
+    report = classification_report(y_true, y_pred, labels = present_classes, target_names = filtered_names, output_dict = True)
     df = pd.DataFrame(report).transpose().round(2)
 
     plt.figure(figsize = (8, 5))
@@ -165,3 +165,11 @@ plt.ylabel('Actual')
 plt.xlabel('Predicted')
 plt.savefig(os.path.join(plot_dir, f'cm_percent_{DOMAIN}_{timestamp}.png'), bbox_inches = 'tight')
 plt.close()
+
+# just in case
+explain_my_model(
+    train_model = model,        
+    validation_data = val_spud, 
+    save_dir = plot_dir,        
+    name_tag = timestamp,
+    class_names = class_names)
