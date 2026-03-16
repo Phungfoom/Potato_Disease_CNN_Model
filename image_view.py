@@ -6,7 +6,8 @@ import config
 from build_sobel_model import sobel_edge_layer
 
 # Random images for report
-base_dir = 'hot_potato'
+script_dir = os.path.dirname(os.path.abspath(__file__))
+base_dir = os.path.join(script_dir, config.BASE_DIR)
 categories = ['leaf_classes','tube_classes']
 
 # Loop to go through folder categories

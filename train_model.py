@@ -1,17 +1,19 @@
 import os
 import argparse
-import tensorflow as tf
-import config
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
-import pandas as pd
 import datetime
 
-from tqdm import tqdm
-from Potato_bunch_brain import build_combined_model
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.utils import class_weight
+from tqdm import tqdm
+
+import config
+from Potato_bunch_brain import build_combined_model
+from grad_cam_visualizer import explain_my_model
 
 # Focus on leaf and tubr for foundation, field is midterm
 parser = argparse.ArgumentParser(description = "Train Potato ID Fusion Model")
@@ -166,10 +168,10 @@ plt.xlabel('Predicted')
 plt.savefig(os.path.join(plot_dir, f'cm_percent_{DOMAIN}_{timestamp}.png'), bbox_inches = 'tight')
 plt.close()
 
-# just in case
 explain_my_model(
-    train_model = model,        
-    validation_data = val_spud, 
-    save_dir = plot_dir,        
-    name_tag = timestamp,
-    class_names = class_names)
+    model=model,
+    validation_data=val_spud,
+    save_dir=plot_dir,
+    name_tag=timestamp,
+    class_names=class_names,
+)

@@ -8,5 +8,7 @@ DROPOUT_RATE = 0.3
 EPOCHS = 10
 
 # Paths
-BASE_DIR = 'hot_potato'
+# Folder that holds the processed training data (e.g. leaf_classes, tube_classes, etc.).
+# All scripts that load images should build paths from this base.
+BASE_DIR = 'processed_data'
 OUTPUT_DIR = 'outputs'

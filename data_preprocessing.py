@@ -1,49 +1,68 @@
 import os
-from tqdm import tqdm # progress bar for looks
-import tensorflow as tf 
+from typing import Iterable, List, Tuple
 
-# Pre processing image files to be the same size format
-script_dir = os.path.dirname(os.path.abspath(__file__))
-input_dir = os.path.join(script_dir, 'data')
-output_dir = os.path.join(script_dir, 'hot_potato')
-target_size = (224,224)
+from tqdm import tqdm
+import tensorflow as tf
 
-image_files = []
+import config
 
-print(f"'{input_dir}'Starting folder structure.")
 
-for root, dir, files in os.walk(input_dir):
-    relative_path = os.path.relpath(root, input_dir)
+IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
+TARGET_SIZE = (224, 224)
 
-    if relative_path == '.':
-        continue
-    
-    destination_folder = os.path.join(output_dir, relative_path)
-    os.makedirs(destination_folder, exist_ok = True)
 
-    for file in files:
-            if file.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp', '.webp')):
+def collect_image_paths(input_dir: str, output_dir: str) -> List[Tuple[str, str]]:
+    image_files: List[Tuple[str, str]] = []
+
+    for root, _, files in os.walk(input_dir):
+        relative_path = os.path.relpath(root, input_dir)
+        if relative_path == ".":
+            continue
+
+        destination_folder = os.path.join(output_dir, relative_path)
+        os.makedirs(destination_folder, exist_ok=True)
+
+        for file in files:
+            if file.lower().endswith(IMAGE_EXTENSIONS):
                 full_input_path = os.path.join(root, file)
                 full_output_path = os.path.join(destination_folder, file)
-            
                 image_files.append((full_input_path, full_output_path))
 
+    return image_files
 
-print('Tensorflow: Resizing.')
 
-for input_path, output_path in tqdm(image_files, desc = 'Resizing'):
-    try:
-        # Standardized RGB 
-        img_bytes = tf.io.read_file(input_path)
-        img = tf.io.decode_image(img_bytes, channels = 3, expand_animations = False)
+def resize_and_save_images(image_files: Iterable[Tuple[str, str]]) -> None:
+    for input_path, output_path in tqdm(image_files, desc="Resizing"):
+        try:
+            img_bytes = tf.io.read_file(input_path)
+            img = tf.io.decode_image(img_bytes, channels=3, expand_animations=False)
 
-        # Standardized image size (224x224)
-        img_resized = tf.image.resize_with_pad(img, target_height = target_size[0], target_width = target_size[1], antialias = True)
+            img_resized = tf.image.resize_with_pad(
+                img,
+                target_height=TARGET_SIZE[0],
+                target_width=TARGET_SIZE[1],
+                antialias=True,
+            )
 
-        # Convert and save directly to the perfectly mapped output_path
-        img_uint8 = tf.cast(img_resized, tf.uint8)
-        encoded_img = tf.io.encode_jpeg(img_uint8, quality = 90)
-        tf.io.write_file(output_path, encoded_img)
+            img_uint8 = tf.cast(img_resized, tf.uint8)
+            encoded_img = tf.io.encode_jpeg(img_uint8, quality=90)
+            tf.io.write_file(output_path, encoded_img)
 
-    except Exception as e:
-        print(f"Skip corrupt file {input_path}: {e}")
+        except Exception as e:
+            print(f"Skip corrupt file {input_path}: {e}")
+
+
+def main() -> None:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    input_dir = os.path.join(script_dir, "data")
+    output_dir = os.path.join(script_dir, config.BASE_DIR)
+
+    print(f"Scanning input images in '{input_dir}'")
+    image_files = collect_image_paths(input_dir, output_dir)
+
+    print("TensorFlow: resizing images.")
+    resize_and_save_images(image_files)
+
+
+if __name__ == "__main__":
+    main()

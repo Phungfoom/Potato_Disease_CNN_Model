@@ -5,28 +5,10 @@ import cv2
 import matplotlib.pyplot as plt
 import os
 
-def compute_gradcam(model: tf.keras.Model,
+def compute_gradcam(model,
                     input_tensors,
-                    branch_key: str) -> np.ndarray:
-    """
-    Compute a Grad-CAM heatmap for a specific branch of the fusion model.
+                    branch_key):
 
-    Parameters
-    ----------
-    model : tf.keras.Model
-        Trained fusion model that exposes a `grad_targets` dict mapping
-        branch keys (e.g. "RGB", "Sobel") to convolutional layer outputs.
-    input_tensors :
-        Model inputs for a **single** sample (e.g. a tuple of
-        `(rgb, gray, sobel)` batches sliced to `batch_size = 1`).
-    branch_key : str
-        Key into `model.grad_targets` specifying which branch to explain.
-
-    Returns
-    -------
-    np.ndarray
-        2D Grad-CAM heatmap with values in `[0, 1]`.
-    """
 
     # Submodel that outputs both the chosen conv feature map and final predictions
     target_conv_output = model.grad_targets[branch_key]
@@ -57,28 +39,10 @@ def compute_gradcam(model: tf.keras.Model,
     return heatmap.numpy()
 
 
-def overlay_heatmap(heatmap: np.ndarray,
-                    original_img: np.ndarray,
-                    alpha: float = 0.6) -> np.ndarray:
-    """
-    Resize and overlay a Grad-CAM heatmap onto the original RGB image.
-
-    Parameters
-    ----------
-    heatmap : np.ndarray
-        2D array with values in `[0, 1]`.
-    original_img : np.ndarray
-        Original RGB image array. Can be in `[0, 1]` or `[0, 255]`.
-    alpha : float, optional
-        Opacity factor for the original image (heatmap uses `1 - alpha`),
-        by default 0.6.
-
-    Returns
-    -------
-    np.ndarray
-        RGB visualization with the heatmap blended on top.
-    """
-
+def overlay_heatmap(heatmap,
+                    original_img,
+                    alpha = 0.6):
+  
     # Match heatmap size to original image
     heatmap_resized = cv2.resize(
         heatmap, (original_img.shape[1], original_img.shape[0])
@@ -96,38 +60,14 @@ def overlay_heatmap(heatmap: np.ndarray,
 
 
 def explain_my_model(
-    model: tf.keras.Model,
+    model,
     validation_data,
     save_dir: str,
     name_tag: str,
     class_names,
-    num_samples: int = 3,
-) -> None:
-    """
-    Generate Grad-CAM visualizations for a few validation samples.
-
-    This function assumes a fusion model trained on three inputs
-    (RGB, grayscale, Sobel) and that `model.grad_targets` contains
-    entries for the "RGB" and "Sobel" branches.
-
-    Parameters
-    ----------
-    model : tf.keras.Model
-        Trained fusion model.
-    validation_data :
-        A `tf.data.Dataset` that yields
-        `((rgb_batch, gray_batch, sobel_batch), labels)`.
-    save_dir : str
-        Directory in which to save the Grad-CAM figures.
-    name_tag : str
-        String appended to output filenames, e.g. experiment name.
-    class_names : Sequence[str]
-        Mapping from class index to human-readable label.
-    num_samples : int, optional
-        Number of samples from the first validation batch to visualize,
-        by default 3.
-    """
-
+    num_samples = 3,
+):
+ 
     os.makedirs(save_dir, exist_ok = True)
 
     # We only need the first batch for visualization
