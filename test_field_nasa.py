@@ -8,7 +8,7 @@ import pandas as pd
 import tensorflow as tf
 
 import config
-from grad_cam_visualizer import explain_my_model
+from grad_cam_visualizer import visualize_gradcam_batch
 from nasa_power_client import fetch_nasa_power_features
 
 
@@ -113,7 +113,7 @@ def main():
     print("Accuracy by light condition:")
     print(summary)
 
-    explain_my_model(
+    visualize_gradcam_batch(
         model=model,
         validation_data=ds,
         save_dir=os.path.join(script_dir, config.OUTPUT_DIR, "fusion", "plots"),

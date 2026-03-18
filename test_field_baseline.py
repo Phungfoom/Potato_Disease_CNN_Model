@@ -9,7 +9,7 @@ import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix
 
 import config
-from grad_cam_visualizer import explain_my_model
+from grad_cam_visualizer import visualize_gradcam_batch
 
 
 def prepare_triple_input(image, label):
@@ -126,7 +126,7 @@ def evaluate_on_field(model_path: str, domain: str = "leaf") -> None:
     )
     plt.close()
 
-    explain_my_model(
+    visualize_gradcam_batch(
         model=model,
         validation_data=field_spud,
         save_dir=plot_dir,

@@ -52,6 +52,8 @@ def build_sobel_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), num_
                                padding = 'same',
                                name = 'sobel_conv3_final')(x)
     
+    # Feed the final conv output forward so it influences the classifier (and Grad-CAM can backprop).
+    x = final_conv_layer_sobel
     # pooling layers 
     x = tf.keras.layers.GlobalAveragePooling2D(name = 'sobel_global_pool')(x)
 

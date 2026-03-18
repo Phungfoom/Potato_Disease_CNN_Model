@@ -8,7 +8,7 @@ import os
 def compute_gradcam(model,
                     input_tensors,
                     branch_key):
-
+    """Compute a Grad-CAM heatmap for a single branch of the model."""
 
     # Submodel that outputs both the chosen conv feature map and final predictions
     target_conv_output = model.grad_targets[branch_key]
@@ -42,7 +42,7 @@ def compute_gradcam(model,
 def overlay_heatmap(heatmap,
                     original_img,
                     alpha = 0.6):
-  
+    """Overlay a Grad-CAM heatmap onto the original RGB image."""
     # Match heatmap size to original image
     heatmap_resized = cv2.resize(
         heatmap, (original_img.shape[1], original_img.shape[0])
@@ -59,15 +59,15 @@ def overlay_heatmap(heatmap,
     return cv2.addWeighted(img_uint8, alpha, heatmap_color, 1 - alpha, 0)
 
 
-def explain_my_model(
+def visualize_gradcam_batch(
     model,
     validation_data,
-    save_dir: str,
-    name_tag: str,
+    save_dir,
+    name_tag,
     class_names,
     num_samples = 3,
 ):
- 
+    """Visualize Grad-CAM results for a few samples from the validation set."""
     os.makedirs(save_dir, exist_ok = True)
 
     # We only need the first batch for visualization

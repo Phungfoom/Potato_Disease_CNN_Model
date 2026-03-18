@@ -33,6 +33,8 @@ def build_grayscale_model(input_shape = (*config.DATA_PARAMS['image_size'], 1), 
                                padding = 'same', 
                                name = 'gray_conv3_final')(x)
     
+    # Feed the final conv output forward so it influences the classifier (and Grad-CAM can backprop).
+    x = final_conv_layer_gray
     x = tf.keras.layers.GlobalAveragePooling2D(name = 'gray_global_pool')(x) 
 
     # Classifier
