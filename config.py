@@ -12,3 +12,8 @@ EPOCHS = 10
 # All scripts that load images should build paths from this base.
 BASE_DIR = 'processed_data'
 OUTPUT_DIR = 'outputs'
+
+# Bump this when you change preprocessing (_to_triple, Sobel path, normalization, etc.) so
+# tf.data file caches are not reused incorrectly. Image size / batch / --augment are
+# already encoded in the cache basename in train_model.py.
+TF_CACHE_PIPELINE_ID = "v1"

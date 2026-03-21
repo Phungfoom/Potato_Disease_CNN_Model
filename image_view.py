@@ -7,6 +7,24 @@ import config
 from build_sobel_model import sobel_edge_layer
 
 
+def _resolve_stage_sources(base_dir: str, stage: str) -> list[tuple[str, str]]:
+    """Return (label, directory) pairs to sample from for a pipeline stage."""
+    stage = stage.strip().lower()
+    if stage in ("train", "foundation", "lab"):
+        stage = "training"
+    if stage in ("field_test", "field-testing"):
+        stage = "field"
+    if stage == "training":
+        sources = [("train", os.path.join(base_dir, "train"))]
+        val_dir = os.path.join(base_dir, "val")
+        if os.path.isdir(val_dir):
+            sources.append(("val", val_dir))
+        return sources
+    if stage in ("field", "nasa"):
+        return [("field_classes", os.path.join(base_dir, "field_classes"))]
+    raise ValueError(f"Unsupported stage: {stage}")
+
+
 def save_image_samples(stage, num_samples_per_class=2):
     """
     Generate and save RGB, grayscale, and Sobel visualizations for report.
@@ -20,10 +38,9 @@ def save_image_samples(stage, num_samples_per_class=2):
     output_base = os.path.join(script_dir, config.OUTPUT_DIR, 'image_samples', stage)
     os.makedirs(output_base, exist_ok=True)
     
-    categories = ['leaf_classes', 'tube_classes']
-    
-    for cat in categories:
-        dataset_dir = os.path.join(base_dir, cat)
+    sources = _resolve_stage_sources(base_dir, stage)
+
+    for source_name, dataset_dir in sources:
         
         if not os.path.exists(dataset_dir):
             print(f'Folder not found: {dataset_dir}')
@@ -37,6 +54,12 @@ def save_image_samples(stage, num_samples_per_class=2):
         )
         
         class_names = dataset.class_names
+        print(f"Sampling from '{source_name}': {len(class_names)} classes")
+        if len(class_names) <= 1:
+            print(
+                f"Warning: source '{source_name}' has {len(class_names)} class. "
+                "Outputs may look single-class only."
+            )
         
         # Track how many samples we've collected per class
         class_counts = {class_name: 0 for class_name in class_names}
@@ -84,7 +107,7 @@ def save_image_samples(stage, num_samples_per_class=2):
                 
                 # Save with descriptive filename
                 sample_num = class_counts[current_class] + 1
-                filename = f"{cat}_{current_class}_{sample_num}.png"
+                filename = f"{source_name}_{current_class}_{sample_num}.png"
                 save_path = os.path.join(output_base, filename)
                 plt.savefig(save_path, bbox_inches='tight', dpi=150)
                 plt.close()
@@ -97,7 +120,10 @@ def save_image_samples(stage, num_samples_per_class=2):
                 break
         
         total_saved = sum(class_counts.values())
-        print(f"Completed {cat}: saved {total_saved} samples across {len(class_names)} classes")
+        print(
+            f"Completed {source_name}: saved {total_saved} samples "
+            f"across {len(class_names)} classes"
+        )
 
 
 def main():
@@ -107,8 +133,9 @@ def main():
     parser.add_argument(
         '--stage',
         type=str,
-        required=True,
-        choices=['training', 'field', 'nasa'],
+        required=False,
+        default='training',
+        choices=['training', 'field', 'nasa', 'train', 'foundation', 'lab', 'field_test', 'field-testing'],
         help='Stage of the pipeline: training (after training/validation), '
              'field (field photos testing), or nasa (after NASA API)'
     )

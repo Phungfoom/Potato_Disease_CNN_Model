@@ -1,6 +1,51 @@
+# --- Virtual environments ---
 .venv/
+venv/
+env/
+
+# --- Python ---
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# --- Tooling caches (if you add these later) ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Secrets / local env (never commit API keys) ---
+.env
+.env.*
+!.env.example
+
+# --- Project: large or regenerable data ---
 Private/
 data/
 processed_data/
+
+# --- Project: all generated training/eval artifacts ---
+# Includes: fusion/models (*.keras), fusion/plots, fusion/nasa_eval, fusion/field_eval,
+#           image_samples/, tf_cache/, etc. (see config.OUTPUT_DIR)
+outputs/
+
+# Legacy tf.data cache files sometimes left in repo root (older runs)
+/spud_cache*
+
+# --- OS noise ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Editors (uncomment if you don't want IDE settings in git) ---
+# .vscode/
+# .idea/

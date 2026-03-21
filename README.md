@@ -3,15 +3,40 @@ A CNN model to perform image classification on potatoes to detect diseases. Mode
 
 2nd step: GPS tracking, live weather, historical data. Gives contextual data as validation for Sobel, Grayscale, and Noise experiments.
 
-Dataset that model is first trained on with reduced noise is from, [Kaggle Diseased Leaves](https://www.kaggle.com/datasets/aarishasifkhan/plantvillage-potato-disease-dataset)
-[Healthy/Late Blight](https://www.kaggle.com/datasets/nirmalsankalana/potato-leaf-healthy-and-late-blight?select=Late+Blight)
-plantvillage-potato-disease-dataset)
+Dataset:
+https://www.kaggle.com/datasets/aarishasifkhan/plantvillage-potato-disease-dataset?resource=download
+Paper:
+https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2016.01419/full
+United States and Switzerland
+
+Dataset:
+https://zenodo.org/records/8286529
+Paper:
+https://pmc.ncbi.nlm.nih.gov/articles/PMC12020891/
+Mbeya region in the Southern Highlands of Tanzania
+November 22, 2022 and April 8, 2023.
+
+Dataset:
+https://www.kaggle.com/datasets/nirmalsankalana/potato-leaf-healthy-and-late-blight?select=Late+Blight
+Paper:
+https://www.researchgate.net/publication/398349800_Temporal_Epidemics_of_Potato_Late_Blight_Phytophthora_Infestans_in_Major_Potato_Growing_Areas_of_Ethiopia
+Ethiopia
+Holeta: June 30, 2022, and June 21, 2023.
+Haramaya: July 21, 2022, and July 14, 2023.
+Negele Arsi: June 29, 2022, and June 24, 2023.
+
 As well as other diseased leaves from.
 [More lab dieseased leaves](https://data.mendeley.com/datasets/rgfhzd5mzw/1)
 
-Data set of diseased potato leaves is from [Diseased leaves](https://www.kaggle.com/datasets/nirmalsankalana/potato-leaf-disease-dataset), geographically, photos are taken in Central Java, Indonesia. Weather and GPS data from NASA power API to accurately train the model on what weather conditions caused the disease.
 
-Stem and Tuber diseases as well. [Tube/root](https://data.mendeley.com/datasets/7vm7xskfg4/2)
+Dataset:
+https://www.kaggle.com/datasets/nirmalsankalana/potato-leaf-disease-dataset
+Paper:
+https://pubmed.ncbi.nlm.nih.gov/38125373/
+Central Java, Indonesia
+August 2, 2023: For potato farms in Magelang, Central Java
+August 15–16, 2023: For potato farms in Wonosobo, Central Java.
+
 **Stress Test**
 
 **Grayscale vs. RGB Analysis:**
