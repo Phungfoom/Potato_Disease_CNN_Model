@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import config
 from build_sobel_model import sobel_edge_layer
 
+#checking
 
 def _resolve_stage_sources(base_dir: str, stage: str) -> list[tuple[str, str]]:
     """Return (label, directory) pairs to sample from for a pipeline stage."""
