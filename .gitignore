@@ -38,8 +38,13 @@ processed_data/
 #           image_samples/, tf_cache/, etc. (see config.OUTPUT_DIR)
 outputs/
 
-# Legacy tf.data cache files sometimes left in repo root (older runs)
+# TensorFlow tf.data disk caches (any folder — root, old layouts, or copied paths)
+# Shards look like: spud_cache_train.data-00000-of-00001 + spud_cache_train.index
 /spud_cache*
+spud_cache_train*
+spud_cache_val*
+spud_cache*.data-*
+spud_cache*.index
 
 # --- OS noise ---
 .DS_Store
