@@ -32,11 +32,16 @@ htmlcov/
 Private/
 data/
 processed_data/
+processed_data_v2/
+*.npz
 
 # --- Project: all generated training/eval artifacts ---
-# Includes: fusion/models (*.keras), fusion/plots, fusion/nasa_eval, fusion/field_eval,
+# Includes: fusion/models (*.keras), fusion/plots, fusion/field_eval,
 #           image_samples/, tf_cache/, etc. (see config.OUTPUT_DIR)
 outputs/
+
+# Prevent accidental root-level model artifacts; keep models in outputs/fusion/models/
+*.keras
 
 # TensorFlow tf.data disk caches (any folder — root, old layouts, or copied paths)
 # Shards look like: spud_cache_train.data-00000-of-00001 + spud_cache_train.index
@@ -50,6 +55,14 @@ spud_cache*.index
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.ipynb
+
+# --- Google Drive sync artifacts ---
+.tmp.driveupload/
+.tmp.drivedownload/
 
 # --- Editors (uncomment if you don't want IDE settings in git) ---
 # .vscode/
